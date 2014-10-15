@@ -58,6 +58,8 @@ var bootStrapper = new function(){
             created: ISODate()
         });
 
+        db.sites.ensureIndex( { url : 1}, {unique : true});
+        
         return db.sites.findOne( { url : siteurl} )._id;    
     }
     

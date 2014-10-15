@@ -7,6 +7,7 @@ function SitepointsRepository() {
 
     var ERR_DUPLICATE_KEY = 11000;
 
+    
     this.connect = function (connectionString) {
         console.log("Connecting to mongodb: " + connectionString);
         mongodb = mongo.connect(connectionString, ['sitepoints', 'sites']);
@@ -35,20 +36,25 @@ function SitepointsRepository() {
         });
     };
 
-    this.getAllSitepointsOfSiteByUrl = function (siteUrl, onSuccess, onError) {
-        self.getSiteByUrl(siteUrl, function (site) {
-            self.getAllSitepointsOfSiteById(site._id.toString(), onSuccess, onError);
+    this.getAllSitepointsOfSiteByUrl = function (siteUrl, onSuccess, onError) {                    
+        
+        self.getSiteByUrl(siteUrl, function (site) {        
+            if(site){            
+                self.getAllSitepointsOfSiteById(site._id.toString(), onSuccess, onError);
+            }else{
+                onSuccess([]); // send empty
+            }
         }, onError);
     };
 
     this.getSiteByUrl = function (url, onSuccess, onError) {
         mongodb.sites.findOne({
             'url': url
-        }, function (err, site) {
-            if (!err) {
+        }, function (err, site) {                                
+            if (err) {                
+                onError(err);                                
+            } else {            
                 onSuccess(site);
-            } else {
-                onError(err);
             }
         });
     };
@@ -57,7 +63,7 @@ function SitepointsRepository() {
 
         var data = {
             url: siteUrl,
-            timestamp: Date.now()
+            created: new Date().toISOString()
         };
 
         mongodb.sites.insert(data,
@@ -80,12 +86,12 @@ function SitepointsRepository() {
         url : "www.devbutze.com/sitepoints",
         sitepoints : [
         {
-        timestamp: 1234,
+        created: ISODate,
         x : 200,
         y : 200
         },
         {
-        timestamp: 1235,
+        created: ISODate,
         x : 100,
         y : 200
         }
@@ -98,7 +104,7 @@ function SitepointsRepository() {
         self.addSite(sitepointDto.url, function (site) {
 
             var data = {
-                timestamp: Date.now(),
+                created: new Date().toISOString(),
                 site_id : site._id,
                 sitepoints : sitepointDto.sitepoints
             };
@@ -111,7 +117,7 @@ function SitepointsRepository() {
                 var resultData = {
                     _id : result._id,
                     site_id : result.site_id,
-                    timestamp : result.timestamp
+                    created : result.created
                 };
                 
                 onSuccess(resultData);

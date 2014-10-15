@@ -1,9 +1,25 @@
 var express = require('express');
 var router = express.Router();
 
+var verifyExists = function(res, obj, desc){
+    if(!obj){
+        res.status(404).send('Resource ' + (desc ? desc : '') + ' not found');
+    }
+}
+
+var internalServerError = function(res, err){
+    res.status(500).send('Internal Server Error: ' + err);
+}
+
+
+// ------------------------------------- QUERIES ------------------------------------------------
+
+
 router.get('/', function (req, res) {
-    res.send('RestAPI is online');
+    res.send('Sitepoints RestAPI is running...');
 });
+
+
 
 router.get('/site/all', function (req, res) {
 
@@ -13,7 +29,7 @@ router.get('/site/all', function (req, res) {
             res.send(JSON.stringify(sites));
         },
         function (error) {
-            res.send(error);      
+          internalServerError(res, error);
       });
 });
 
@@ -23,10 +39,13 @@ router.get('/site', function (req, res) {
     var site_url = req.query.url;
         
     repository.getSiteByUrl(site_url, function (site) {
+        
+            verifyExists(res, site, site_url);            
             res.send(JSON.stringify(site));
+        
         },
         function (error) {
-            res.send(error);      
+            internalServerError(res, error);
       });
     
     
@@ -36,15 +55,16 @@ router.get('/sitepoint/all', function (req, res) {
     
     var repository = req.sitepointsRepository;
     var site_url = req.query.url;
-        
+    
     repository.getAllSitepointsOfSiteByUrl(site_url, function (sitepoints) {
+        
+            verifyExists(res, sitepoints, site_url );
             res.send(JSON.stringify(sitepoints));
+        
         },
         function (error) {
-            res.send(error);      
-      });
-    
-    
+            internalServerError(res, error);
+      });    
 });
 
 
@@ -54,13 +74,17 @@ router.get('/site/:site_id/sitepoint/all', function (req, res) {
     var siteId = req.params.site_id;
     
     repository.getAllSitepointsOfSiteById(siteId, function (sitepoints) {
+        
+            verifyExists(res, sitepoints, siteId );
             res.send(JSON.stringify(sitepoints));
         },
         function (error) {
-            res.send(error);      
+            internalServerError(res, error);
       });    
 });
 
+
+// ------------------------------------- COMMANDS ------------------------------------------------
 
 router.post('/site', function(req, res){
     var repository = req.sitepointsRepository;    
@@ -68,7 +92,7 @@ router.post('/site', function(req, res){
     repository.addSite(req.body.url, function(result){
         res.send(JSON.stringify(result));
     }, function(error){
-        res.send(error);
+        internalServerError(res, error);
     });
 
 });
@@ -80,7 +104,7 @@ router.post('/sitepoints', function(req, res){
     repository.addSitepoints(req.body, function(result){
         res.send(JSON.stringify(result));
     }, function(error){
-        res.send(error);
+        internalServerError(res, error);
     });
 
 });
