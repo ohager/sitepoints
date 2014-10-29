@@ -56,11 +56,8 @@ router.get('/sitepoint/all', function (req, res) {
     var repository = req.sitepointsRepository;
     var site_url = req.query.url;
     
-    repository.getAllSitepointsOfSiteByUrl(site_url, function (sitepoints) {
-        
-            verifyExists(res, sitepoints, site_url );
-            res.send(JSON.stringify(sitepoints));
-        
+    repository.getAllSitepointsOfSiteByUrl(site_url, function (sitepoints) {                
+            res.send(JSON.stringify(sitepoints));        
         },
         function (error) {
             internalServerError(res, error);
@@ -73,9 +70,7 @@ router.get('/site/:site_id/sitepoint/all', function (req, res) {
     var repository = req.sitepointsRepository;
     var siteId = req.params.site_id;
     
-    repository.getAllSitepointsOfSiteById(siteId, function (sitepoints) {
-        
-            verifyExists(res, sitepoints, siteId );
+    repository.getAllSitepointsOfSiteById(siteId, function (sitepoints) {        
             res.send(JSON.stringify(sitepoints));
         },
         function (error) {
@@ -85,6 +80,11 @@ router.get('/site/:site_id/sitepoint/all', function (req, res) {
 
 
 // ------------------------------------- COMMANDS ------------------------------------------------
+
+/*
+{$match : { site_id : ObjectId('543731a8b63f6f43b12d7f89')}} , {$unwind : '$sitepoints'}{ $group : { _id : "$site_id", sitepoints : { $push : "$sitepoints"}}}
+*/
+
 
 router.post('/site', function(req, res){
     var repository = req.sitepointsRepository;    

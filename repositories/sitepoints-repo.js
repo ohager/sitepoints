@@ -1,5 +1,6 @@
 var mongodriver = require("mongodb");
 var mongo = require("mongojs");
+var ObjectId = require('mongodb').ObjectID;
 
 function SitepointsRepository() {
     var self = this;
@@ -25,15 +26,18 @@ function SitepointsRepository() {
     };
 
     this.getAllSitepointsOfSiteById = function (siteId, onSuccess, onError) {
-        mongodb.sitepoints.find({
-            'site_id': new mongodriver.ObjectID(siteId)
-        }, function (err, sitepoints) {
-            if (!err) {
-                onSuccess(sitepoints);
-            } else {
-                onError(err);
-            }
-        });
+        mongodb.sitepoints.aggregate([{$match :
+            {site_id : ObjectId(siteId)}},
+            {$unwind : '$sitepoints'},
+            {$group : { _id : "$site_id", sitepoints : { $push : "$sitepoints"}}}
+            ],
+            function (err, sitepoints) {
+                if (!err) {
+                    onSuccess(sitepoints);
+                } else {
+                    onError(err);
+                }
+            });
     };
 
     this.getAllSitepointsOfSiteByUrl = function (siteUrl, onSuccess, onError) {                    

@@ -76,3 +76,9 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+# IDE
+# ===========================
+
+# WebStorm
+.idea
