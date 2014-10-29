@@ -24,7 +24,7 @@ Prerequisites
 Note:
 
 For Windows exist a batch file that starts up both node.js and MongoDb.
-Just call start.bat
+Just call `start.bat`
 
 
 (*) There is still a problem with global node.js dependencies, I'll resolve this soon.
