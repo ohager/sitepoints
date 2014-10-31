@@ -5,7 +5,9 @@ function SitepointsRepository() {
     var self = this;
     var mongodb = null;
 
-    var ERR_DUPLICATE_KEY = 11000;
+    var MongoErrorCode = {
+        DUPLICATE_KEY : 11000
+    };
 
     
     this.connect = function (connectionString) {
@@ -83,10 +85,14 @@ function SitepointsRepository() {
             created: new Date().toISOString()
         };
 
+        var siteExists = function (err){
+            return err && err.code === MongoErrorCode.DUPLICATE_KEY;
+        };
+
         mongodb.sites.insert(data,
             function (err, result) {
 
-                if (err && err.code === ERR_DUPLICATE_KEY) {
+                if (siteExists(err)) {
                     self.getSiteByUrl(data.url, onSuccess, onError);
                     return;
                 }
