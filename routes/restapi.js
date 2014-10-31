@@ -5,11 +5,11 @@ var verifyExists = function(res, obj, desc){
     if(!obj){
         res.status(404).send('Resource ' + (desc ? desc : '') + ' not found');
     }
-}
+};
 
 var internalServerError = function(res, err){
     res.status(500).send('Internal Server Error: ' + err);
-}
+};
 
 
 // ------------------------------------- QUERIES ------------------------------------------------
@@ -79,11 +79,23 @@ router.get('/site/:site_id/sitepoint/all', function (req, res) {
 });
 
 
-// ------------------------------------- COMMANDS ------------------------------------------------
+router.get('/site/:site_id/sitepoint/', function (req, res) {
 
-/*
-{$match : { site_id : ObjectId('543731a8b63f6f43b12d7f89')}} , {$unwind : '$sitepoints'}{ $group : { _id : "$site_id", sitepoints : { $push : "$sitepoints"}}}
-*/
+    var repository = req.sitepointsRepository;
+    var filter = JSON.parse( req.query.filter );
+
+    repository.getSitepointsByFilter(filter, function(sitepoints){
+        res.status(501).send(sitepoints);
+        //res.send(JSON.stringify(sitepoints))
+    },
+    function(error){
+        internalServerError(res, error)
+    }
+    );
+});
+
+
+// ------------------------------------- COMMANDS ------------------------------------------------
 
 
 router.post('/site', function(req, res){
@@ -111,19 +123,3 @@ router.post('/sitepoints', function(req, res){
 
 
 module.exports = router;
-
-/*
-{ url: "http://www.contoso.com/index.html",
-    sp: [
-        {
-            timestamp: "TIMESTAMP" ,
-            x: 123,
-            y: 23
-        },
-        {
-            timestamp: "TIMESTAMP" ,
-            x: 200,
-            y: 79
-        },
-    ]
-}*/

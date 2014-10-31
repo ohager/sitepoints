@@ -10,18 +10,18 @@ var bootStrapper = new function(){
     var printError = function(message){
         print("\n###ERROR: " + message + "\n");
         quit();
-    }
+    };
     
     var printInfo = function(message){
         print("\n###INFO: " + message + "\n");        
-    }
+    };
 
 
     var assertMinimumVersion = function(minversion){
         if(/\d*\.\d*/.exec(version())[0] < minversion){
             printError('You need at least version <' + minversion + '> of MongoDB');
         }
-    }
+    };
     
     var assertNotAppliedYet = function(){
         
@@ -29,17 +29,15 @@ var bootStrapper = new function(){
         
         if(collections.length === 0) return;
         
-        printInfo("Found the following collections:")
+        printInfo("Found the following collections:");
         collections.forEach( function(collectionName){
             print(collectionName + ( collectionName === 'sitepoints' || collectionName === 'sites' ? ' [ok]' : ''));
-        })
+        });
         
         var hasSites =  collections.indexOf('sites') >= 0;
         var hasSitepoints =  collections.indexOf('sitepoints') >= 0;
         
         if(hasSitepoints && hasSites){
-            var site = db.sites.findOne({url : SITE_URL});
-            var totalSitepoints =  countSitepoints(site._id);
             printInfo("Your database is complete! Bootstrapping not necessary.");
             quit();
         }
@@ -49,7 +47,7 @@ var bootStrapper = new function(){
             quit();            
         }    
         
-    }
+    };
     
     var insertSite = function(siteurl){        
         
@@ -61,49 +59,25 @@ var bootStrapper = new function(){
         db.sites.ensureIndex( { url : 1}, {unique : true});
         
         return db.sites.findOne( { url : siteurl} )._id;    
-    }
+    };
     
     var insertRandomPoints = function(siteId, n){
-        
-        var sitepoints = [];
-        
+
         for(var i=0; i<n; ++i){
-            sitepoints.push({
-                created : ISODate(),
-                x : 100 + (_rand() * 300)<<0,
-                y : 100 + (_rand() * 300)<<0
-            })
+            var sitepoint = {
+                site_id: siteId,
+                created: ISODate(),
+                x: 100 + (_rand() * 300) << 0,
+                y: 100 + (_rand() * 300) << 0
+            };
+            db.sitepoints.insert( sitepoint );
         }
-        
-        var dataset = {
-            site_id : siteId,
-            sitepoints : sitepoints
-        };
-        
-        db.sitepoints.insert( dataset );        
-    }
+
+    };
     
     var countSitepoints = function(siteId){
-        var result = db.sitepoints.mapReduce(
-            
-            function(){ emit(this.site_id, {count: 0, points: this.sitepoints}) },
-            
-            function(key, values){                                       
-                var reduced = {count:0, points: 0}
-                
-                for(var i=0; i<values.length; ++i){
-                    reduced.count += values[i].points.length;                    
-                }
-                
-                return reduced; },
-            {
-                query: {site_id : siteId},
-                out : {inline : 1}
-            }
-        );
-        
-        return result.results[0] ? result.results[0].value.count : 0;
-    }
+        return db.sitepoints.count( {site_id : siteId});
+    };
     
     var createSitepoints= function(siteId){
         print('Creating some test data...\n');
@@ -113,7 +87,7 @@ var bootStrapper = new function(){
         insertRandomPoints(siteId, 8);        
         
         print('...created ' +  countSitepoints(siteId) + ' sitepoints.'  );
-    }
+    };
 
     this.go = function(){
         
@@ -125,8 +99,8 @@ var bootStrapper = new function(){
         var id = insertSite(SITE_URL);
         createSitepoints(id);
         
-    }
-}
+    };
+};
 
 
 bootStrapper.go();

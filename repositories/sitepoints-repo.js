@@ -1,4 +1,3 @@
-var mongodriver = require("mongodb");
 var mongo = require("mongojs");
 var ObjectId = require('mongodb').ObjectID;
 
@@ -25,15 +24,29 @@ function SitepointsRepository() {
         });
     };
 
+    this.getSitepointsByFilter = function(filter, onSuccess, onError){
+        onError("Not implemented yet!");
+    };
+
     this.getAllSitepointsOfSiteById = function (siteId, onSuccess, onError) {
-        mongodb.sitepoints.aggregate([{$match :
-            {site_id : ObjectId(siteId)}},
-            {$unwind : '$sitepoints'},
-            {$group : { _id : "$site_id", sitepoints : { $push : "$sitepoints"}}}
+        mongodb.sitepoints.aggregate([
+                {
+                    $match :
+                    {
+                        site_id : ObjectId(siteId)
+                    }
+                },
+                {
+                    $group :
+                    {
+                        _id : '$site_id',
+                        sitepoints : { $push : { created: '$created' , x : '$x', y: '$y' } }
+                    }
+                }
             ],
             function (err, sitepoints) {
                 if (!err) {
-                    onSuccess(sitepoints);
+                    onSuccess(sitepoints[0]);
                 } else {
                     onError(err);
                 }
@@ -107,27 +120,33 @@ function SitepointsRepository() {
 
         self.addSite(sitepointDto.url, function (site) {
 
-            var data = {
-                created: new Date().toISOString(),
-                site_id : site._id,
-                sitepoints : sitepointDto.sitepoints
-            };
-            
-            mongodb.sitepoints.insert(data, function (err, result) {
-                if(err){
-                    onError(err); return;
-                }
-                
-                var resultData = {
-                    _id : result._id,
-                    site_id : result.site_id,
-                    created : result.created
-                };
-                
-                onSuccess(resultData);
-            });
+            var sitepoints = sitepointDto.sitepoints;
+            var receiveDate = new Date().toISOString();
 
-        }, function (err) {
+            for(var i = 0; i< sitepoints.length; ++i){
+                var point = sitepoints[i];
+                var data = {
+                    site_id : site._id,
+                    created: (!point.created? receiveDate : point.created),
+                    x : point.x,
+                    y : point.y
+                };
+
+                mongodb.sitepoints.insert(data, function (err) {
+                    if(err){
+                        onError(err);
+                    }
+                });
+            }
+
+            var resultData = {
+                site_id: site._id,
+                receiveDate: receiveDate,
+                sitepoints_received: sitepoints.length
+            };
+
+            onSuccess(resultData);
+    }, function (err) {
             onError(err);
         });
     }
