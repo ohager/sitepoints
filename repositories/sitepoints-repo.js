@@ -1,5 +1,6 @@
-var mongo = require("mongojs");
-var ObjectId = require('mongodb').ObjectID;
+var $q = require("q");
+var $mongo = require("mongojs");
+var $objectId = require('mongodb').ObjectID;
 
 function SitepointsRepository() {
     var self = this;
@@ -9,33 +10,40 @@ function SitepointsRepository() {
         DUPLICATE_KEY : 11000
     };
 
-    
     this.connect = function (connectionString) {
         console.log("Connecting to mongodb: " + connectionString);
-        mongodb = mongo.connect(connectionString, ['sitepoints', 'sites']);
+        mongodb = $mongo.connect(connectionString, ['sitepoints', 'sites']);
         return self;
     };
 
-    this.getAllSites = function (onSuccess, onError) {
+    this.getAllSites = function () {
+        var deferred = $q.defer();
+
         mongodb.sites.find(function (err, sites) {
             if (!err) {
-                onSuccess(sites);
+                deferred.resolve(sites);
             } else {
-                onError(err);
+                deferred.reject(err);
             }
         });
+
+        return deferred.promise;
     };
 
-    this.getSitepointsByFilter = function(filter, onSuccess, onError){
-        onError("Not implemented yet!");
+    this.getSitepointsByFilter = function(filter){
+        var deferred = $q.defer();
+        deferred.reject("Not implemented yet!");
+        return deferred.promise;
     };
 
-    this.getAllSitepointsOfSiteById = function (siteId, onSuccess, onError) {
+    this.getAllSitepointsOfSiteById = function (siteId) {
+        var deferred = $q.defer();
+
         mongodb.sitepoints.aggregate([
                 {
                     $match :
                     {
-                        site_id : ObjectId(siteId)
+                        site_id : $objectId(siteId)
                     }
                 },
                 {
@@ -48,34 +56,27 @@ function SitepointsRepository() {
             ],
             function (err, sitepoints) {
                 if (!err) {
-                    onSuccess(sitepoints[0]);
+                    deferred.resolve(sitepoints[0]);
                 } else {
-                    onError(err);
+                    deferred.reject(err);
                 }
             });
+
+        return deferred.promise;
     };
 
-    this.getAllSitepointsOfSiteByUrl = function (siteUrl, onSuccess, onError) {                    
-        
-        self.getSiteByUrl(siteUrl, function (site) {        
-            if(site){            
-                self.getAllSitepointsOfSiteById(site._id.toString(), onSuccess, onError);
-            }else{
-                onSuccess([]); // send empty
-            }
-        }, onError);
-    };
-
-    this.getSiteByUrl = function (url, onSuccess, onError) {
+    this.getSiteByUrl = function (url) {
+        var deferred = $q.defer();
         mongodb.sites.findOne({
             'url': url
-        }, function (err, site) {                                
-            if (err) {                
-                onError(err);                                
-            } else {            
-                onSuccess(site);
+        }, function (err, site) {
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve(site)
             }
         });
+        return deferred.promise;
     };
 
     this.addSite = function (siteUrl, onSuccess, onError) {
@@ -89,20 +90,27 @@ function SitepointsRepository() {
             return err && err.code === MongoErrorCode.DUPLICATE_KEY;
         };
 
+        var deferred = $q.defer();
         mongodb.sites.insert(data,
             function (err, result) {
 
                 if (siteExists(err)) {
-                    self.getSiteByUrl(data.url, onSuccess, onError);
-                    return;
+                    self.getSiteByUrl(data.url, onSuccess, onError).then(
+                        function(site){
+                            deferred.resolve(site);
+                        },
+                        function(err){
+                            deferred.reject(err);
+                        }
+                    );
+                }else if (err){
+                    deferred.reject(err);
+                }else{
+                    deferred.resolve(result);
                 }
 
-                if (err) {
-                    onError(err);
-                } else {
-                    onSuccess(result);
-                }
             });
+        return deferred.promise;
     };
     /*
     {
@@ -122,15 +130,17 @@ function SitepointsRepository() {
 
     }
     */
-    this.addSitepoints = function (sitepointDto, onSuccess, onError) {
+    this.addSitepoints = function (sitepointDto) {
 
-        self.addSite(sitepointDto.url, function (site) {
+        var deferred = $q.defer();
+        var sitepoints = sitepointDto.sitepoints;
+        var receiveDate = new Date().toISOString();
+        var progressed = 0;
 
-            var sitepoints = sitepointDto.sitepoints;
-            var receiveDate = new Date().toISOString();
+        self.addSite(sitepointDto.url).then(function (site) {
 
-            for(var i = 0; i< sitepoints.length; ++i){
-                var point = sitepoints[i];
+            for(var i = 0; i< 1000; ++i){
+                var point = sitepoints[i%2];
                 var data = {
                     site_id : site._id,
                     created: (!point.created? receiveDate : point.created),
@@ -139,23 +149,28 @@ function SitepointsRepository() {
                 };
 
                 mongodb.sitepoints.insert(data, function (err) {
-                    if(err){
-                        onError(err);
+                    if(!err){
+                        progressed++;
+                        data['progressed'] = progressed;
+                        if(progressed === sitepoints.length){
+                            var resultData = {
+                                site_id: data.site_id,
+                                receiveDate: receiveDate,
+                                sitepoints_received: sitepoints.length,
+                                sitepoints_added: data.progressed
+                            };
+                            deferred.resolve(resultData);
+                        }
+                    }else {
+                        deferred.reject(err);
                     }
                 });
             }
-
-            var resultData = {
-                site_id: site._id,
-                receiveDate: receiveDate,
-                sitepoints_received: sitepoints.length
-            };
-
-            onSuccess(resultData);
-    }, function (err) {
-            onError(err);
+        }).fail(function (err) {
+            deferred.reject(err);
         });
-    }
+        return deferred.promise;
+    };
 }
 
 
