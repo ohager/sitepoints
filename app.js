@@ -4,10 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var sitepointsRepository = require('./repositories/sitepoints-repo').connect('localhost:27017/sitepoints');
-
+var sitepointsContext = require('./contexts/sitepoint-context');
 var routes = require('./routes/index');
-var restapi = require('./routes/restapi');
+
+var sitepointApi = require('./routes/restapi/sitepoint-api');
+var siteApi = require('./routes/restapi/site-api');
+var userApi = require('./routes/restapi/user-api');
 
 var app = express();
 
@@ -22,14 +24,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Make our db accessible to our $router
 app.use(function(req,res,next){
-    req.sitepointsRepository = sitepointsRepository;
+    req.sitepointsContext = sitepointsContext;
     next();
 });
 
-app.use('/restapi', restapi);
+// REST API definitions
+app.use('/restapi/user', userApi);
+app.use('/restapi/site', siteApi);
+app.use('/restapi/sitepoint', sitepointApi);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
