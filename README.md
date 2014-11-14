@@ -16,8 +16,9 @@ Prerequisites
 - Installed Node.Js (1.4+)
 
 1. Just checkout the project
+2. Run database bootstrapper
 2. Launch the MongoDb (from project root path)
-  `mongod --dbpath ./data`
+  `mongod --dbpath ./data --auth`
 3. Start node.js application (from project folder)
   `npm start`
   
@@ -29,11 +30,16 @@ Just call `start.bat`
 
 (*) There is still a problem with global node.js dependencies, I'll resolve this soon.
 
-For Developers
---------------
+Run MongoDB Bootstrapper
+------------------------
 
-To setup the project for developement it is recommended to run the MongoDB bootstrapper. That guy initializes the data base
-with some startup data. Simply run `mongo mongo-bootstrap.js`.
+The bootstrapper initializes the data base, i.e. creates a default user and some startup data.
+It is important that the `mongod` runs *without* enabled authorization, otherwise you won't get the script run.
+When mongo server is running simply call `mongo mongo-bootstrap.js`.
+
+The default user is `sitepoints`. Password is the same.
+
+
 
 
 

@@ -6,6 +6,7 @@ print('-----------------------\nSitepoints MongoDB Bootstrapper\n---------------
 
 var bootStrapper = new function(){
     var SITE_URL = 'www.devbutze.com/sitepoints/bootstrap';
+    var USER_NAME = 'sitepoints';
 
     var printError = function(message){
         print("\n###ERROR: " + message + "\n");
@@ -26,27 +27,25 @@ var bootStrapper = new function(){
     var assertNotAppliedYet = function(){
         
         var collections = db.getCollectionNames();
-        
-        if(collections.length === 0) return;
-        
-        printInfo("Found the following collections:");
-        collections.forEach( function(collectionName){
-            print(collectionName + ( collectionName === 'sitepoints' || collectionName === 'sites' ? ' [ok]' : ''));
-        });
-        
+
         var hasSites =  collections.indexOf('sites') >= 0;
         var hasSitepoints =  collections.indexOf('sitepoints') >= 0;
-        
-        if(hasSitepoints && hasSites){
+        var hasUser = db.getUser(USER_NAME) != null;
+
+        print("Collection 'sitepoints':" + (hasSitepoints ? "[OK]" : "[FAIL]") );
+        print("Collection 'sitepoints':" + (hasSitepoints ? "[OK]" : "[FAIL]") );
+        print("User '" + USER_NAME + "':" + (hasUser ? "[OK]" : "[FAIL]") );
+
+        if(hasSitepoints && hasSites && hasUser){
             printInfo("Your database is complete! Bootstrapping not necessary.");
             quit();
         }
-        
-        if(hasSitepoints || hasSites){
-            printError("The database seems corrupted. To run the bootstrapper ensure that neither the collection 'sitepoints' nor 'sites' exist.");
-            quit();            
-        }    
-        
+
+        if(hasSitepoints || hasSites || hasUser) {
+            printError("The database seems corrupted. It is recommended to drop the 'sitepoints' database and rerun the bootstrapper.");
+            quit();
+        }
+
     };
     
     var insertSite = function(siteurl){        
@@ -89,16 +88,28 @@ var bootStrapper = new function(){
         print('...created ' +  countSitepoints(siteId) + ' sitepoints.'  );
     };
 
+    var createUser = function (username, password) {
+        print('Creating user...\n');
+        db.createUser(
+            {
+                user: username,
+                pwd: password,
+                roles: [ { role: "readWrite", db: "sitepoints"} ]
+            }
+        );
+        print('...created [' + username + ']' );
+    };
+
     this.go = function(){
         
         db = db.getSiblingDB('sitepoints');  
         
         assertMinimumVersion(2.6);
         assertNotAppliedYet();
-        print('Creating site: ' + SITE_URL);                
+        print('Creating site: ' + SITE_URL);
         var id = insertSite(SITE_URL);
         createSitepoints(id);
-        
+        createUser(USER_NAME, USER_NAME);
     };
 };
 
