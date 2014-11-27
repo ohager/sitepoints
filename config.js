@@ -1,5 +1,5 @@
 module.exports = {
     database : {
-        connection :'localhost:27017/sitepoints'
+        connection :'mongodb://sitepoints:sitepoints@localhost:27017/sitepoints'
     }
-}
+};

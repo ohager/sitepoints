@@ -1,6 +1,5 @@
 var $q = require("q");
 var $mongo = require("mongojs");
-var $objectId = require('mongodb').ObjectID;
 
 function SitesRepository() {
     var self = this;
@@ -51,7 +50,7 @@ function SitesRepository() {
             created: new Date().toISOString()
         };
 
-        var siteExists = function (err){
+        var siteExists = function (err) {
             return err && err.code === MongoErrorCode.DUPLICATE_KEY;
         };
 
@@ -61,24 +60,22 @@ function SitesRepository() {
 
                 if (siteExists(err)) {
                     self.getSiteByUrl(data.url, onSuccess, onError).then(
-                        function(site){
+                        function (site) {
                             deferred.resolve(site);
                         },
-                        function(err){
+                        function (err) {
                             deferred.reject(err);
                         }
                     );
-                }else if (err){
+                } else if (err) {
                     deferred.reject(err);
-                }else{
+                } else {
                     deferred.resolve(result);
                 }
 
             });
         return deferred.promise;
     };
-
-
-};
+}
 
 module.exports = new SitesRepository();
