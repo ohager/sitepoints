@@ -17,6 +17,7 @@
         "debug": "0.7.3",
         "passport" : "*",
         "passport-http" : "*",
-        "react" : "*"
+        "react" : "*",
+        "crypto" : "*"
     }
 }

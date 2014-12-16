@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var sitepointsContext = require('./contexts/sitepoint-context');
 var auth = require('./common/auth');
+var apikey = require('./common/apikey');
 
 var sitepointApi = require('./routes/restapi/sitepoint-api');
 var siteApi = require('./routes/restapi/site-api');
@@ -70,5 +71,8 @@ app.use(function (err, req, res) {
 process.on('uncaughtException', function(err){
     console.log(err);
 });
+
+var key = apikey.create({user:'admin'});
+console.info(key);
 
 module.exports = app;
