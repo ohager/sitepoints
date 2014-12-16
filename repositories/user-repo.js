@@ -12,9 +12,26 @@ function UserRepository(){
 
     this.connect = function (connectionString) {
         console.log("Connecting to mongodb: " + connectionString);
-        mongodb = $mongo.connect(connectionString, ['user']);
+        mongodb = $mongo.connect(connectionString, ['users']);
         return self;
     };
+
+
+    this.findUser = function(username){
+        var deferred = $q.defer();
+
+        mongodb.users.findOne({
+            'username': username
+        }, function (err, user) {
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve(user)
+            }
+        });
+
+        return deferred.promise;
+    }
 
 }
 

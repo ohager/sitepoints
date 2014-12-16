@@ -1,4 +1,5 @@
 var $express = require('express');
+var $auth = require('../../common/auth');
 var $router = $express.Router();
 
 var verifyExists = function(res, obj, desc){
@@ -14,7 +15,7 @@ var internalServerError = function(res, err){
 
 // ------------------------------------- QUERIES ------------------------------------------------
 
-$router.get('/all', function (req, res) {
+$router.get('/all',$auth.authenticate(), function (req, res) {
 
     var repository = req.sitepointsContext.siteRepository;
 

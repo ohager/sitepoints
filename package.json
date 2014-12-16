@@ -16,7 +16,7 @@
         "mongojs": "*",
         "debug": "0.7.3",
         "passport" : "*",
-        "passport-local" : "*",
+        "passport-http" : "*",
         "react" : "*"
     }
 }
