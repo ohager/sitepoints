@@ -1,11 +1,8 @@
 var $router = require('express').Router();
-var React = require('react');
-    //DOM = React.DOM,
-    //myComponent = React.createFactory(require('./components/mycomponent'))
 
 $router.get('/', function(req,res){
     res.send("I will be your view, aber zackig!");
-})
+});
 
 module.exports = $router;
 

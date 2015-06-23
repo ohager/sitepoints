@@ -11,7 +11,7 @@ function SitesRepository() {
 
     this.connect = function (connectionString) {
         console.log("Connecting to mongodb: " + connectionString);
-        mongodb = $mongo.connect(connectionString, ['sites']);
+        mongodb = $mongo(connectionString, ['sites']);
         return self;
     };
 

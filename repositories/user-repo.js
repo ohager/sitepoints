@@ -12,7 +12,7 @@ function UserRepository(){
 
     this.connect = function (connectionString) {
         console.log("Connecting to mongodb: " + connectionString);
-        mongodb = $mongo.connect(connectionString, ['users']);
+        mongodb = $mongo(connectionString, ['users']);
         return self;
     };
 

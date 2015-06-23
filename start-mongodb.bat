@@ -1,8 +1,7 @@
 @echo off
-set mongodir="c:\Programmierung\mongodb\bin"
-set sitepointsdir="C:\Programmierung\nodejs\projects\sitepoints"
+set sitepointsdir=%CD%
 
 echo Starting mongodb...
-call %mongodir%\mongod --dbpath %sitepointsdir%\data
+call mongod.exe --dbpath "%sitepointsdir%\data"
 
 

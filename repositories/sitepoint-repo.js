@@ -8,7 +8,7 @@ function SitepointsRepository() {
 
     this.connect = function (connectionString) {
         console.log("Connecting to mongodb: " + connectionString);
-        mongodb = $mongo.connect(connectionString, ['sitepoints']);
+        mongodb = $mongo(connectionString, ['sitepoints']);
         return self;
     };
 

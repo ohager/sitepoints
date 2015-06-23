@@ -3,5 +3,5 @@ module.exports = {
         //connection :'mongodb://sitepoints:sitepoints@localhost:27017/sitepoints'
         connection :'mongodb://localhost:27017/sitepoints'
     },
-    authentication : true
+    authentication : false
 };
