@@ -52,7 +52,7 @@ function SitepointsRepository() {
         var sitepointCount = sitepoints.length;
         var progressed = 0;
 
-        var receiveDate = new Date().toISOString();
+        var receiveDate = Date.now();
         for(var i = 0; i< sitepointCount; ++i) {
             var point = sitepoints[i];
 

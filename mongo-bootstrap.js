@@ -52,7 +52,7 @@ var bootStrapper = new function(){
         
         db.sites.insert({         
             url : siteurl,
-            created: ISODate()
+            created: Date.now()
         });
 
         db.sites.ensureIndex( { url : 1}, {unique : true});
@@ -65,7 +65,7 @@ var bootStrapper = new function(){
         for(var i=0; i<n; ++i){
             var sitepoint = {
                 site_id: siteId,
-                created: ISODate(),
+                created: Date.now(),
                 x: 100 + (_rand() * 300) << 0,
                 y: 100 + (_rand() * 300) << 0
             };
