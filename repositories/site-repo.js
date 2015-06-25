@@ -37,7 +37,7 @@ function SitesRepository() {
             if (err) {
                 deferred.reject(err);
             } else {
-                deferred.resolve(site)
+                deferred.resolve(site);
             }
         });
         return deferred.promise;

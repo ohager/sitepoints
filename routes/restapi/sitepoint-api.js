@@ -1,9 +1,6 @@
+var $responseUtils = require('../../utils/response-utils');
 var $express = require('express');
 var $router = $express.Router();
-
-var internalServerError = function(res, err){
-    res.status(500).send('Internal Server Error: ' + err);
-};
 
 var addSitepoints = function(req, res){
     var repository = req.sitepointsContext.sitepointRepository;
@@ -17,7 +14,7 @@ var addSitepoints = function(req, res){
         repository.addSitepoints(data.site_id, data.sitepoints).then( function(result){
             res.send(JSON.stringify(result));
         }, function(error){
-            internalServerError(res, error);
+            $responseUtils.internalServerError(res, error);
         });
     }
 };
@@ -25,22 +22,28 @@ var addSitepoints = function(req, res){
 
 // ------------------------------------- QUERIES ------------------------------------------------
 
-$router.get('/sitepoint/all', function (req, res) {
+$router.get('/all', function (req, res) {
     
-    var repository = req.sitepointsContext.sitepointRepository;
+    var sitepointRepository = req.sitepointsContext.sitepointRepository;
+    var siteRepository = req.sitepointsContext.siteRepository;
     var site_url = req.query.url;
 
-    repository.getSiteByUrl(site_url)
+    if(!site_url){
+        $responseUtils.badRequestError(res,"Missing parameter: 'url'");
+        return;
+    }
+
+    siteRepository.getSiteByUrl(site_url)
         .then(
             function(site){
-                return repository.getAllSitepointsOfSiteById(site._id.toString());
+                return sitepointRepository.getAllSitepointsOfSiteById(site._id.toString());
             }
         ).then(
             function (sitepoints) {
                 res.send(JSON.stringify(sitepoints));
             },
             function (error) {
-                internalServerError(res, error);
+                $responseUtils.internalServerError(res, error);
             }
         );
 });
@@ -73,11 +76,9 @@ $router.post('/', function(req, res){
             }
         ).fail(
             function(err){
-                internalServerError(err);
+                $responseUtils.internalServerError(err);
             }
         );
 });
-
-
 
 module.exports = $router;
