@@ -1,16 +1,9 @@
 var $q = require("q");
-var $mongo = require("mongojs");
 var $objectId = require('mongodb').ObjectID;
+var BaseRepository = require("./base-repo");
+
 
 function SitepointsRepository() {
-    var self = this;
-    var mongodb = null;
-
-    this.connect = function (connectionString) {
-        console.log("Connecting to mongodb: " + connectionString);
-        mongodb = $mongo(connectionString, ['sitepoints']);
-        return self;
-    };
 
     this.getSitepointsByFilter = function(filter){
         var deferred = $q.defer();
@@ -82,5 +75,7 @@ function SitepointsRepository() {
     };
 }
 
+SitepointsRepository.prototype = new BaseRepository("sitepoints");
+SitepointsRepository.prototype.constructor = SitepointsRepository;
 
-module.exports = new SitepointsRepository;
+module.exports = new SitepointsRepository();
