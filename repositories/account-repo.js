@@ -6,7 +6,7 @@ function AccountRepository(){
     this.findAccountByUsername = function(username){
         var deferred = $q.defer();
 
-        mongodb.accounts.findOne({
+        this.mongodb.accounts.findOne({
             'username': username
         }, function (err, account) {
             if (err) {
@@ -22,7 +22,7 @@ function AccountRepository(){
     this.findAccountByDomain = function(domain){
         var deferred = $q.defer();
 
-        mongodb.accounts.findOne({
+        this.mongodb.accounts.findOne({
             'domain': domain
         }, function (err, account) {
             if (err) {

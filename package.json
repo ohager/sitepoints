@@ -21,6 +21,8 @@
     "serve-favicon": "*"
   },
   "devDependencies": {
-    "jasmine": "^2.3.1"
+    "jasmine": "^2.3.1",
+    "karma": "^0.12.37",
+    "requirejs": "^2.1.18"
   }
 }

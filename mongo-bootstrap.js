@@ -65,9 +65,6 @@ var bootStrapper = new function(){
     };
 
     var insertRandomPoints = function(accountId, url, n){
-
-
-
         for(var i=0; i<n; ++i){
             var sitepoint = {
                 account_id: accountId,
@@ -78,7 +75,6 @@ var bootStrapper = new function(){
             };
             db.sitepoints.insert( sitepoint );
         }
-
     };
     
     var countSitepoints = function(accountId){
