@@ -6,8 +6,8 @@ var bodyParser = require('body-parser');
 var sitepointsContext = require('./contexts/sitepoint-context');
 
 var sitepointApi = require('./routes/restapi/sitepoint-api');
-var siteApi = require('./routes/restapi/site-api');
-var userApi = require('./routes/restapi/user-api');
+//var siteApi = require('./routes/restapi/site-api');
+var accountApi = require('./routes/restapi/account-api');
 var dashboardApi = require('./routes/restapi/dashboard-api');
 
 var viewIndex = require('./views/index');
@@ -34,7 +34,7 @@ app.use(function(req,res,next){
 
 // REST API routing
 app.use('/restapi/dashboard', dashboardApi);
-app.use('/restapi/user', userApi);
+app.use('/restapi/account', accountApi);
 app.use('/restapi/site', siteApi);
 app.use('/restapi/sitepoint', sitepointApi);
 

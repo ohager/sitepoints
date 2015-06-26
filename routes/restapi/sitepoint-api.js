@@ -25,7 +25,6 @@ var addSitepoints = function(req, res){
 $router.get('/all', function (req, res) {
     
     var sitepointRepository = req.sitepointsContext.sitepointRepository;
-    var siteRepository = req.sitepointsContext.siteRepository;
     var site_url = req.query.url;
 
     if(!site_url){

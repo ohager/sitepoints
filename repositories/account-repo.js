@@ -2,7 +2,7 @@ var $q = require("q");
 var $mongo = require("mongojs");
 var $objectId = require('mongodb').ObjectID;
 
-function UserRepository(){
+function AccountRepository(){
     var self = this;
     var mongodb = null;
 
@@ -17,11 +17,11 @@ function UserRepository(){
     };
 
 
-    this.findUser = function(username){
+    this.findAccountByUser = function(username){
         var deferred = $q.defer();
 
-        mongodb.users.findOne({
-            'username': username
+        mongodb.accounts.findOne({
+            'user': username
         }, function (err, user) {
             if (err) {
                 deferred.reject(err);
@@ -35,4 +35,4 @@ function UserRepository(){
 
 }
 
-module.exports = new UserRepository();
+module.exports = new AccountRepository();

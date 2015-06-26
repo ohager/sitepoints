@@ -16,7 +16,7 @@ var internalServerError = function(res, err){
 
 
 $router.get('/', function (req, res) {
-    res.send('User API - Implement me');
+    res.send('Account API - Implement me');
 });
 
 

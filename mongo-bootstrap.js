@@ -5,8 +5,15 @@ Bootstrapper for sitepoints mongodb
 print('-----------------------\nSitepoints MongoDB Bootstrapper\n-----------------------');
 
 var bootStrapper = new function(){
-    var SITE_URL = 'www.devbutze.com/sitepoints/bootstrap';
     var USER_NAME = 'sitepoints';
+
+    var ACCOUNT = {
+        firstName : "Oliver",
+        lastName : "Häger",
+        domain : "devbutze.com",
+        username : "ohager",
+        created: Date.now()
+    };
 
     var printError = function(message){
         print("\n###ERROR: " + message + "\n");
@@ -28,43 +35,43 @@ var bootStrapper = new function(){
         
         var collections = db.getCollectionNames();
 
-        var hasSites =  collections.indexOf('sites') >= 0;
+        var hasAccounts =  collections.indexOf('accounts') >= 0;
         var hasSitepoints =  collections.indexOf('sitepoints') >= 0;
         var hasUser = db.getUser(USER_NAME) != null;
 
         print("Collection 'sitepoints':" + (hasSitepoints ? "[OK]" : "[FAIL]") );
-        print("Collection 'sitepoints':" + (hasSitepoints ? "[OK]" : "[FAIL]") );
+        print("Collection 'accounts':" + (hasAccounts ? "[OK]" : "[FAIL]") );
         print("User '" + USER_NAME + "':" + (hasUser ? "[OK]" : "[FAIL]") );
 
-        if(hasSitepoints && hasSites && hasUser){
+        if(hasSitepoints && hasAccounts && hasUser){
             printInfo("Your database is complete! Bootstrapping not necessary.");
             quit();
         }
 
-        if(hasSitepoints || hasSites || hasUser) {
+        if(hasSitepoints || hasAccounts || hasUser ) {
             printError("The database seems corrupted. It is recommended to drop the 'sitepoints' database and rerun the bootstrapper.");
             quit();
         }
 
     };
-    
-    var insertSite = function(siteurl){        
-        
-        db.sites.insert({         
-            url : siteurl,
-            created: Date.now()
-        });
 
-        db.sites.ensureIndex( { url : 1}, {unique : true});
-        
-        return db.sites.findOne( { url : siteurl} )._id;    
+    var insertAccount = function(){
+
+        db.accounts.insert(ACCOUNT);
+        db.accounts.ensureIndex( { domain: 1}, {unique : true});
+        db.accounts.ensureIndex( { username: 1}, {unique : true});
+
+        return db.accounts.findOne( { domain : ACCOUNT.domain } )._id;
     };
-    
-    var insertRandomPoints = function(siteId, n){
+
+    var insertRandomPoints = function(accountId, url, n){
+
+
 
         for(var i=0; i<n; ++i){
             var sitepoint = {
-                site_id: siteId,
+                account_id: accountId,
+                url: url,
                 created: Date.now(),
                 x: 100 + (_rand() * 300) << 0,
                 y: 100 + (_rand() * 300) << 0
@@ -74,18 +81,18 @@ var bootStrapper = new function(){
 
     };
     
-    var countSitepoints = function(siteId){
-        return db.sitepoints.count( {site_id : siteId});
+    var countSitepoints = function(accountId){
+        return db.sitepoints.count( {account_id : accountId});
     };
     
-    var createSitepoints= function(siteId){
+    var createSitepoints= function(accountId){
         print('Creating some test data...\n');
         
-        insertRandomPoints(siteId, 3);
-        insertRandomPoints(siteId, 5);    
-        insertRandomPoints(siteId, 8);        
+        insertRandomPoints(accountId, "http://www.devbutze.com/sitepoints", 3);
+        insertRandomPoints(accountId, "http://www.devbutze.com/sitepoints/page1", 5);
+        insertRandomPoints(accountId, "http://www.devbutze.com/sitepoints/page2/sub3", 8);
         
-        print('...created ' +  countSitepoints(siteId) + ' sitepoints.'  );
+        print('...created ' +  countSitepoints(accountId) + ' sitepoints.'  );
     };
 
     var createUser = function (username, password) {
@@ -106,9 +113,9 @@ var bootStrapper = new function(){
         
         assertMinimumVersion(2.6);
         assertNotAppliedYet();
-        print('Creating site: ' + SITE_URL);
-        var id = insertSite(SITE_URL);
-        createSitepoints(id);
+        print('Creating Account: ' + JSON.stringify(ACCOUNT));
+        var accountId = insertAccount();
+        createSitepoints(accountId);
         createUser(USER_NAME, USER_NAME);
     };
 };
