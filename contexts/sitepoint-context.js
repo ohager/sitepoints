@@ -6,7 +6,7 @@ function SitepointsContext(){
 
     this.sitepointRepository = require('../repositories/sitepoint-repo').connect(connectionString);
     this.siteRepository = require('../repositories/site-repo').connect(connectionString);
-    this.userRepository = require('../repositories/user-repo').connect(connectionString);
+    this.accountRepository = require('../repositories/account-repo').connect(connectionString);
 
 }
 

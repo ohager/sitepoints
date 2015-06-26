@@ -12,21 +12,37 @@ function AccountRepository(){
 
     this.connect = function (connectionString) {
         console.log("Connecting to mongodb: " + connectionString);
-        mongodb = $mongo(connectionString, ['users']);
+        mongodb = $mongo(connectionString, ['accounts']);
         return self;
     };
 
 
-    this.findAccountByUser = function(username){
+    this.findAccountByUsername = function(username){
         var deferred = $q.defer();
 
         mongodb.accounts.findOne({
-            'user': username
-        }, function (err, user) {
+            'username': username
+        }, function (err, account) {
             if (err) {
                 deferred.reject(err);
             } else {
-                deferred.resolve(user)
+                deferred.resolve(account)
+            }
+        });
+
+        return deferred.promise;
+    }
+
+    this.findAccountByDomain = function(domain){
+        var deferred = $q.defer();
+
+        mongodb.accounts.findOne({
+            'domain': domain
+        }, function (err, account) {
+            if (err) {
+                deferred.reject(err);
+            } else {
+                deferred.resolve(account)
             }
         });
 

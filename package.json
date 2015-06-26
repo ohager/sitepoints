@@ -19,5 +19,8 @@
     "passport-http": "*",
     "q": "^1.4.1",
     "serve-favicon": "*"
+  },
+  "devDependencies": {
+    "jasmine": "^2.3.1"
   }
 }
