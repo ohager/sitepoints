@@ -7,7 +7,7 @@ var sitepointsContext = require('./contexts/sitepoint-context');
 
 var sitepointApi = require('./routes/restapi/sitepoint-api');
 var accountApi = require('./routes/restapi/account-api');
-var dashboardApi = require('./routes/restapi/dashboard-api');
+var dashboardApi = require('./routes/restapi/dashboard/dashboard-api');
 
 var viewIndex = require('./views/index');
 

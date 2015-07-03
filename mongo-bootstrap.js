@@ -11,7 +11,7 @@ var bootStrapper = new function(){
         firstName : "Oliver",
         lastName : "Häger",
         domain : "devbutze.com",
-        username : "ohager",
+        user : "ohager",
         created: Date.now()
     };
 
@@ -58,8 +58,8 @@ var bootStrapper = new function(){
     var insertAccount = function(){
 
         db.accounts.insert(ACCOUNT);
-        db.accounts.ensureIndex( { domain: 1}, {unique : true});
-        db.accounts.ensureIndex( { username: 1}, {unique : true});
+        //db.accounts.ensureIndex( { domain: 1}, {unique : true});
+        db.accounts.ensureIndex( { user: 1}, {unique : true});
 
         return db.accounts.findOne( { domain : ACCOUNT.domain } )._id;
     };

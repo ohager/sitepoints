@@ -1,7 +1,7 @@
 var $router = require('express').Router();
 
 $router.get('/', function(req,res){
-    res.send("I will be your view, aber zackig!");
+    res.sendfile("I will be your view, aber zackig!");
 });
 
 module.exports = $router;

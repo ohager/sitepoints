@@ -1,6 +1,9 @@
 var $responseUtils = require('../../utils/response-utils');
+var $authInterceptor = require('../../utils/auth-interceptor');
 var $express = require('express');
 var $router = $express.Router();
+
+// base route: /restapi/sitepoints
 
 var addSitepoints = function(req, res){
     var repository = req.sitepointsContext.sitepointRepository;
@@ -22,7 +25,7 @@ var addSitepoints = function(req, res){
 
 // ------------------------------------- QUERIES ------------------------------------------------
 
-$router.get('/all', function (req, res) {
+$router.get('/all', [ $authInterceptor.verifyAccount,  function (req, res) {
     
     var sitepointRepository = req.sitepointsContext.sitepointRepository;
     var site_url = req.query.url;
@@ -32,20 +35,13 @@ $router.get('/all', function (req, res) {
         return;
     }
 
-    siteRepository.getSiteByUrl(site_url)
-        .then(
-            function(site){
-                return sitepointRepository.getAllSitepointsOfSiteById(site._id.toString());
-            }
-        ).then(
-            function (sitepoints) {
-                res.send(JSON.stringify(sitepoints));
-            },
-            function (error) {
-                $responseUtils.internalServerError(res, error);
-            }
-        );
-});
+    sitepointRepository.getAllSitepointsByUrl(site_url).then(function(sitepoints){
+        res.send(sitepoints);
+    }).catch(function(err){
+        $responseUtils.internalServerError(res, err);
+    });
+
+}]);
 
 
 // ------------------------------------- COMMANDS ------------------------------------------------
@@ -64,20 +60,15 @@ $router.get('/all', function (req, res) {
     ]
 }
  */
-$router.post('/', function(req, res){
-    var siteRepository = req.sitepointsContext.siteRepository;
+$router.post('/', [$authInterceptor.verifyAccount, function(req, res){
+    var sitepointRepository = req.sitepointsContext.sitepointRepository;
+    var sitepoints = req.body;
 
-    siteRepository.addOrGetSite(req.body.url)
-        .then(
-            function(site){
-                req.body['site_id'] = site._id.toString();
-                addSitepoints(req, res);
-            }
-        ).fail(
-            function(err){
-                $responseUtils.internalServerError(err);
-            }
-        );
-});
+    sitepointRepository.addSitepoints(sitepoints).then(function(){
+        $responseUtils.noContent(res);
+    }).catch(function(err){
+        $responseUtils.internalServerError(res,err);
+    })
+}]);
 
 module.exports = $router;
