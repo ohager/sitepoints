@@ -1,10 +1,10 @@
 var $responseUtils = require('../../utils/response-utils');
-var $authInterceptor = require('../../utils/auth-interceptor');
+var $apiKeyInterceptor = require('../../utils/apikey-interceptor');
 var $express = require('express');
 var $router = $express.Router();
 
 function validateAccountSchema(account) {
-    return account.lastName && account.firstName && account.domain && account.user;
+    return account.lastName && account.firstName && account.domain && account.user && account.password;
 }
 
 // ------------------------------------- QUERIES ------------------------------------------------
@@ -31,7 +31,7 @@ $router.post('/', function (req, res) {
     var account = req.body;
 
     if(!validateAccountSchema(account)){
-        $responseUtils.badRequestError(res, "Account needs at least 'firstName','lastName','domain','user'");
+        $responseUtils.badRequestError(res, "Account needs at least 'firstName','lastName','domain','user','password'");
     }
 
     accountRepository.findAccountByUser(account.user).then(function(accounts){

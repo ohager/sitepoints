@@ -1,38 +1,41 @@
 var $q = require("q");
 var $objectId = require('mongodb').ObjectID;
+var $config = require('../config');
 var BaseRepository = require("./base-repo");
+
 
 function AuthenticationRepository(){
 
-
-    this.findUser = function (filter) {
+    this.saveToken = function (token) {
         var deferred = $q.defer();
-        this.mongodb.accounts.find(filter,
+
+        var authToken = {
+            token : token,
+            expiry : Date.now() + $config.auth.tokenExpiry
+        };
+
+        this.mongodb.auths.insert(authToken,
             function (err, data) {
                 this.handleDeferredDbResult(deferred, err, data);
             }.bind(this));
         return deferred.promise;
     };
 
-    this.findAccountByUser = function(username){
-        return this.getAccountsByFilter({username:username});
+    this.findToken = function(token){
+        this.mongodb.auths.findOne({token:token}, function(err,data){
+            this.handleDeferredDbResult(deferred, err, data);
+        }.bind(this));
     };
 
-    this.findAccountById = function(id){
-        var deferred = $q.defer();
-        this.mongodb.accounts.findOne({_id:$objectId(id)},
-            function (err, data) {
-                this.handleDeferredDbResult(deferred, err, data);
-            }.bind(this));
-        return deferred.promise;
-    };
-
-    this.findAccountByDomain = function(domain){
-        return this.getAccountsByFilter({domain:domain});
+    this.removeToken = function(token){
+        this.mongodb.auths.remove({token:token}, function(err,data){
+            this.handleDeferredDbResult(deferred, err, data);
+        }.bind(this));
     }
+
 }
 
-AuthenticationRepository.prototype = new BaseRepository("accounts");
+AuthenticationRepository.prototype = new BaseRepository("auths");
 AuthenticationRepository.prototype.constructor = AuthenticationRepository;
 
 module.exports = new AuthenticationRepository();

@@ -6,15 +6,23 @@ function ResponseUtils(){
     };
 
     this.conflictError = function(res, err){
-        res.status(409).send('Conflict : ' + err).end();
+        res.status(409).send(err).end();
     };
 
     this.badRequestError = function(res, err){
-        res.status(400).send('Bad Request: ' + err).end();
+        res.status(400).send(err).end();
     };
 
-    this.forbiddenError = function(re, err){
-        res.status(403).send('Forbidden: ' + err).end();
+    this.forbiddenError = function(res, err){
+        res.status(403).send(err).end();
+    };
+
+    this.unauthorizedError = function(res, err){
+        res.status(401).send(err).end();
+    };
+
+    this.notFoundError = function(res, err){
+        res.status(404).send(err).end();
     };
 
     this.created = function(res,id){

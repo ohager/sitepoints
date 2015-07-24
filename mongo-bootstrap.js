@@ -9,9 +9,10 @@ var bootStrapper = new function(){
 
     var ACCOUNT = {
         firstName : "Oliver",
-        lastName : "Häger",
+        lastName : "Hager",
         domain : "devbutze.com",
         user : "ohager",
+        password : "ohager",
         created: Date.now()
     };
 
@@ -48,7 +49,7 @@ var bootStrapper = new function(){
             quit();
         }
 
-        if(hasSitepoints || hasAccounts || hasUser ) {
+        if(hasSitepoints || hasAccounts || hasUser) {
             printError("The database seems corrupted. It is recommended to drop the 'sitepoints' database and rerun the bootstrapper.");
             quit();
         }

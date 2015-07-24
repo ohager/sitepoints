@@ -17,7 +17,7 @@ describe("Account Repository", function(){
     });
 
     it("returns a specific account by domain", function(done) {
-        accountRepo.findAccountByDomain("devbutze.com").then(
+        accountRepo.findAccountsByDomain("devbutze.com").then(
             function(account){
                 expect(account.username).toBe("ohager");
                 expect(account.domain).toBe("devbutze.com");

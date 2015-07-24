@@ -7,7 +7,8 @@ var sitepointsContext = require('./contexts/sitepoint-context');
 
 var sitepointApi = require('./routes/restapi/sitepoint-api');
 var accountApi = require('./routes/restapi/account-api');
-var dashboardApi = require('./routes/restapi/dashboard/dashboard-api');
+var loginApi = require('./routes/restapi/backoffice/login-api');
+
 
 var viewIndex = require('./views/index');
 
@@ -17,7 +18,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
     next();
 });
 
@@ -32,7 +33,7 @@ app.use(function(req,res,next){
 });
 
 // REST API routing
-app.use('/restapi/dashboard', dashboardApi);
+app.use('/restapi/backoffice', loginApi);
 app.use('/restapi/account', accountApi);
 app.use('/restapi/sitepoint', sitepointApi);
 

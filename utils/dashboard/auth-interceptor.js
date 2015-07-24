@@ -1,25 +1,23 @@
-var accountRepo = require("../repositories/account-repo");
-var apikeyService = require("../services/apikey-service");
+var authRepo = require("../repositories/auth-repo");
+var authService = require("../services/auth-service");
 var $responseUtils = require("../utils/response-utils");
 var $config = require("../config");
 
 
-function AuthInterceptor(){
+function ApiKeyInterceptor(){
 
-    this.verifyAccount = function(req, res, next){
+    this.verifyToken = function(req, res, next){
 
-        if(!$config.apiKeyRequired) {
-            next();
-            return;
+
+
+        var token = req.get("Authorization");
+        if(!token){
+            $responseUtils.unauthorizedError(res, "");
         }
 
-        var k = req.query.k;
-        if(!k){
-            $responseUtils.badRequestError(res, "Missing query attribute 'k'");
-        }
+        token = token.replace("SP-AUTH ", "");
 
-        var id = k.slice(0,24);
-        var signature = k.slice(24);
+        #######
 
         accountRepo.findAccountById(id)
             .then(function(account) {
@@ -39,4 +37,4 @@ function AuthInterceptor(){
     }
 }
 
-module.exports = new AuthInterceptor();
+module.exports = new ApiKeyInterceptor();

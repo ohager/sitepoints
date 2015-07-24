@@ -1,9 +1,9 @@
 var $responseUtils = require('../../utils/response-utils');
-var $authInterceptor = require('../../utils/auth-interceptor');
+var $apikeyInterceptor = require('../../utils/apikey-interceptor');
 var $express = require('express');
 var $router = $express.Router();
 
-// base route: /restapi/sitepoints
+// base route: /restapi/sitepoint
 
 var addSitepoints = function(req, res){
     var repository = req.sitepointsContext.sitepointRepository;
@@ -25,7 +25,7 @@ var addSitepoints = function(req, res){
 
 // ------------------------------------- QUERIES ------------------------------------------------
 
-$router.get('/all', [ $authInterceptor.verifyAccount,  function (req, res) {
+$router.get('/all', [ $apikeyInterceptor.verifyAccount,  function (req, res) {
     
     var sitepointRepository = req.sitepointsContext.sitepointRepository;
     var site_url = req.query.url;
@@ -60,7 +60,7 @@ $router.get('/all', [ $authInterceptor.verifyAccount,  function (req, res) {
     ]
 }
  */
-$router.post('/', [$authInterceptor.verifyAccount, function(req, res){
+$router.post('/', [$apikeyInterceptor.verifyAccount, function(req, res){
     var sitepointRepository = req.sitepointsContext.sitepointRepository;
     var sitepoints = req.body;
 
