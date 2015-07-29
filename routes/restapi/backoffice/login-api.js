@@ -29,7 +29,12 @@ $router.post('/login', function (req, res) {
         generatedToken = accessToken;
         return req.sitepointsContext.authRepository.saveToken(generatedToken);
     }).then(function(){
-        res.set("Authorization", "SP-AUTH "  + generatedToken).status(200).send();
+        res.set("Authorization", "SP-AUTH "  + generatedToken).status(200).send({
+            firstName: foundAccount.firstName,
+            lastName: foundAccount.lastName,
+            user: foundAccount.user,
+            domain : foundAccount.domain
+        });
     }).catch( function(err){
         $responseUtils.internalServerError(res,err);
     });

@@ -11,8 +11,10 @@ function AuthenticationRepository(){
 
         var authToken = {
             token : token,
-            expiry : Date.now() + $config.auth.tokenExpiry
+            expiry : Date.now() + ($config.auth.tokenExpiry * 1000)
         };
+
+        console.log(JSON.stringify(authToken));
 
         this.mongodb.auths.insert(authToken,
             function (err, data) {

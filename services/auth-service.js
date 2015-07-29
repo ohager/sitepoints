@@ -21,7 +21,8 @@ function AuthService(){
 
     this.generatePasswordHash = function(password){
         var deferred = $q.defer();
-
+        // TODO: remove hardcoded secret/salt and use a randomic sequence instead.
+        // This randomic sequence can be prepended to the generated hash
         var hmac = $crypto.createHmac('sha512', "RUZAKqdP7gY92OyRzq7r");
         hmac.setEncoding('hex');
         hmac.end(password, function () {
