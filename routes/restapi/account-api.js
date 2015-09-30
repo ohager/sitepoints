@@ -1,5 +1,7 @@
 var $responseUtils = require('../../utils/response-utils');
-var $apiKeyInterceptor = require('../../utils/apikey-interceptor');
+var $authInterceptor = require('../../utils/auth-interceptor');
+var $apikeyService= require('../../services/apikey-service');
+
 var $express = require('express');
 var $router = $express.Router();
 
@@ -9,21 +11,31 @@ function validateAccountSchema(account) {
 
 // ------------------------------------- QUERIES ------------------------------------------------
 
-
-$router.get('/', function (req, res) {
+$router.put('/:user', function (req, res) {
     res.send('Account API - Implement me');
 });
 
-$router.get('/:user', function (req, res) {
+$router.get('/:user', [$authInterceptor.verifyToken, function (req, res) {
     var accountRepository = req.sitepointsContext.accountRepository;
     var user = req.params.user;
-    accountRepository.findAccountByUser(user).then(function(account){
-        res.send(account);
+    var accountRet = null;
+    accountRepository.findAccountByUser(user).then(function (account) {
+        accountRet = account;
+        if(!accountRet){
+            $responseUtils.notFoundError(res, "");
+            return;
+        }
+        return $apikeyService.generate(accountRet);
+    }).then(function(apikey){
+        accountRet.apikey = accountRet._id + apikey ;
+        accountRet.created = new Date(accountRet.created).toUTCString();
+        delete accountRet.password;
+        delete accountRet._id;
+        res.send(accountRet);
     }).catch(function(err){
         $responseUtils.internalServerError(res, err);
     })
-
-});
+}]);
 
 
 $router.post('/', function (req, res) {
@@ -34,15 +46,17 @@ $router.post('/', function (req, res) {
         $responseUtils.badRequestError(res, "Account needs at least 'firstName','lastName','domain','user','password'");
     }
 
-    accountRepository.findAccountByUser(account.user).then(function(accounts){
-        if(accounts.length === 0){
+    accountRepository.findAccountByUser(account.user).then(function(userAccount){
+        if(!userAccount){
             return accountRepository.createAccount(account);
         }
         else{
-            $responseUtils.conflictError(res,"Account for user '" + account.user + "' already exists");
+            $responseUtils.conflictError(res,"Account for user '" + userAccount.user + "' already exists");
         }
     }).then(function(account){
-        $responseUtils.created(res,account._id.toString());
+        $responseUtils.created(res, {
+            id: account._id.toString()
+        });
     }).catch(function(err){
         $responseUtils.internalServerError(res,err);
     })

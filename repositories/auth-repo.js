@@ -24,15 +24,21 @@ function AuthenticationRepository(){
     };
 
     this.findToken = function(token){
+        var deferred = $q.defer();
+
         this.mongodb.auths.findOne({token:token}, function(err,data){
             this.handleDeferredDbResult(deferred, err, data);
         }.bind(this));
+
+        return deferred.promise;
     };
 
     this.removeToken = function(token){
+        var deferred = $q.defer();
         this.mongodb.auths.remove({token:token}, function(err,data){
             this.handleDeferredDbResult(deferred, err, data);
         }.bind(this));
+        return deferred.promise;
     }
 
 }

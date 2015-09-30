@@ -32,6 +32,11 @@ function AuthService(){
         return deferred.promise;
     };
 
+
+    this.purgeExpiredTokens = function(){
+        // TODO: Scheduled clean up of expired tokens
+    }
+
 }
 
 module.exports = new AuthService();

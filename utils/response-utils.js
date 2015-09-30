@@ -1,8 +1,12 @@
+var $config = require('../config');
+
+
 
 function ResponseUtils(){
 
     this.internalServerError = function(res, err){
-        res.status(500).send('Internal Server Error: ' + err).end();
+        var errMsg = $config.debugMode ? err : "Ask your admin!";
+        res.status(500).send('Internal Server Error: ' + errMsg).end();
     };
 
     this.conflictError = function(res, err){
