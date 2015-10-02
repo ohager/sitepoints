@@ -1,19 +1,17 @@
 var $responseUtils = require('../../utils/response-utils');
 var $authInterceptor = require('../../utils/auth-interceptor');
 var $apikeyService= require('../../services/apikey-service');
+var _ = require('lodash');
 
 var $express = require('express');
 var $router = $express.Router();
 
 function validateAccountSchema(account) {
-    return account.lastName && account.firstName && account.domain && account.user && account.password;
+    return account.lastName && account.firstName && account.domains && account.user && account.password;
 }
 
 // ------------------------------------- QUERIES ------------------------------------------------
 
-$router.put('/:user', function (req, res) {
-    res.send('Account API - Implement me');
-});
 
 $router.get('/:user', [$authInterceptor.verifyToken, function (req, res) {
     var accountRepository = req.sitepointsContext.accountRepository;
@@ -43,7 +41,7 @@ $router.post('/', function (req, res) {
     var account = req.body;
 
     if(!validateAccountSchema(account)){
-        $responseUtils.badRequestError(res, "Account needs at least 'firstName','lastName','domain','user','password'");
+        $responseUtils.badRequestError(res, "Account needs at least 'firstName','lastName','domains','user','password'");
     }
 
     accountRepository.findAccountByUser(account.user).then(function(userAccount){
@@ -63,5 +61,25 @@ $router.post('/', function (req, res) {
 
 });
 
+
+$router.put('/:user', [$authInterceptor.verifyToken, function (req, res) {
+    var accountRepository = req.sitepointsContext.accountRepository;
+    var newAccount = req.body;
+    var user = req.params.user;
+    accountRepository.findAccountByUser(user).then(function( foundAccount ) {
+        if(foundAccount){
+            var updatedAccoount = _.assign(foundAccount, newAccount);
+            return accountRepository.updateAccount(updatedAccoount, !!newAccount.password);
+        }
+        else{
+            $responseUtils.notFoundError(res,"Account for user '" + foundAccount.user + "' does not exist.");
+        }
+    }).then(function(){
+        $responseUtils.noContent(res);
+    }).catch(function(err){
+        $responseUtils.internalServerError(res,err);
+    })
+
+}]);
 
 module.exports = $router;

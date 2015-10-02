@@ -57,6 +57,29 @@ function AccountRepository(){
 
         return deferred.promise;
     };
+
+    this.updateAccount = function(account, updatePassword){
+        var deferred = $q.defer();
+        var self = this;
+
+        if(updatePassword){
+            $authService.generatePasswordHash(account.password).then(
+                function(hashedPassword) {
+                    account.password = hashedPassword;
+                    self.mongodb.accounts.update( { user : account.user} ,account, function (err, data) {
+                        self.handleDeferredDbResult(deferred, err, data);
+                    })
+                });
+        }else
+        {
+            self.mongodb.accounts.update( { user : account.user} ,account, function (err, data) {
+                self.handleDeferredDbResult(deferred, err, data);
+            })
+        }
+
+
+        return deferred.promise;
+    }
 }
 
 AccountRepository.prototype = new BaseRepository("accounts");
