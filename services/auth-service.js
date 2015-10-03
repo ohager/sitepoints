@@ -1,11 +1,34 @@
 var $q = require("q");
 var $crypto = require("crypto");
 
-function AuthService(){
-    this.generateAccessToken = function() {
+function AuthService() {
+
+    this.sign = function (signature, message) {
         var deferred = $q.defer();
 
-        $crypto.randomBytes(20,function(err, buf){
+        var hmac = $crypto.createHmac('ripemd160', message + 'w8zDwZnYwwmaaXGJJZrM');
+        hmac.setEncoding('hex');
+        hmac.end(signature, function () {
+            deferred.resolve(hmac.read());
+        });
+
+        return deferred.promise;
+    };
+
+    this.verify = function(signature, message, digestSignatureOrigin){
+        var deferred = $q.defer();
+
+        this.sign(signature, message).then(function(digest){
+                deferred.resolve(digest === digestSignatureOrigin);
+        });
+
+        return deferred.promise;
+    };
+
+    this.generateAccessToken = function () {
+        var deferred = $q.defer();
+
+        $crypto.randomBytes(20, function (err, buf) {
             var message = buf.toString('hex') + Date.now();
 
             var hash = $crypto.createHash('sha512');
@@ -19,7 +42,7 @@ function AuthService(){
         return deferred.promise;
     };
 
-    this.generatePasswordHash = function(password){
+    this.generatePasswordHash = function (password) {
         var deferred = $q.defer();
         // TODO: remove hardcoded secret/salt and use a randomic sequence instead.
         // This randomic sequence can be prepended to the generated hash
@@ -33,7 +56,7 @@ function AuthService(){
     };
 
 
-    this.purgeExpiredTokens = function(){
+    this.purgeExpiredTokens = function () {
         // TODO: Scheduled clean up of expired tokens
     }
 

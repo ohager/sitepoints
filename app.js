@@ -7,7 +7,7 @@ var sitepointsContext = require('./contexts/sitepoint-context');
 
 var sitepointApi = require('./routes/restapi/sitepoint-api');
 var accountApi = require('./routes/restapi/account-api');
-var loginApi = require('./routes/restapi/backoffice/login-api');
+var loginApi = require('./routes/restapi/auth-api');
 
 
 var viewIndex = require('./views/index');
@@ -35,7 +35,7 @@ app.use(function(req,res,next){
 });
 
 // REST API routing
-app.use('/restapi/backoffice', loginApi);
+app.use('/restapi/auth', loginApi);
 app.use('/restapi/account', accountApi);
 app.use('/restapi/sitepoint', sitepointApi);
 

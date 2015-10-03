@@ -14,8 +14,6 @@ function AuthenticationRepository(){
             expiry : Date.now() + ($config.auth.tokenExpiry * 1000)
         };
 
-        console.log(JSON.stringify(authToken));
-
         this.mongodb.auths.insert(authToken,
             function (err, data) {
                 this.handleDeferredDbResult(deferred, err, data);
@@ -35,11 +33,12 @@ function AuthenticationRepository(){
 
     this.removeToken = function(token){
         var deferred = $q.defer();
+        token = token.replace("SP-AUTH ","");
         this.mongodb.auths.remove({token:token}, function(err,data){
             this.handleDeferredDbResult(deferred, err, data);
         }.bind(this));
         return deferred.promise;
-    }
+    };
 
 }
 
