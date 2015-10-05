@@ -38,8 +38,8 @@ function ResponseUtils(){
         res.status(204).end();
     };
 
-    this.ok = function(res){
-        res.status(200).end();
+    this.ok = function(res, data){
+        res.status(200).send(data).end();
     };
 }
 

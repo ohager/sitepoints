@@ -6,7 +6,7 @@ module.exports = {
     },
     apiKeyRequired : false,
     auth : {
-        required : true,
+        required : false,
         tokenExpiry : 60 * 10 // 10 minutes
     }
 };

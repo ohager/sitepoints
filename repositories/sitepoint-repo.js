@@ -14,6 +14,20 @@ function SitepointsRepository() {
         return deferred.promise;
     };
 
+    this.getSitepointsGroupedByUrl = function (regexp) {
+        var deferred = $q.defer();
+        this.mongodb.sitepoints.group( {
+                key : { url : 1 },
+                cond : { url : { $in : [regexp] }},
+                reduce : function(){},
+                initial : {}
+            },
+            function (err, data) {
+                this.handleDeferredDbResult(deferred, err, data);
+            }.bind(this));
+        return deferred.promise;
+    };
+
     this.getAllSitepointsByAccountId = function (accountId) {
         return this.getSitepointsByFilter({account_id: $objectId(accountId)});
     };
